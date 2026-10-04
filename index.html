@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>marketsnipertool.site - Complete Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background-color: #0d1110; color: #E0E0E0; padding-bottom: 40px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 480px; min-height: 100vh; background-color: #0d1110; display: flex; flex-direction: column; position: relative; }
+
+        /* Header */
+        header { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background-color: #121816; border-bottom: 1px solid #1f2b26; }
+        .logo-area { display: flex; align-items: center; gap: 10px; }
+        header h1 { font-size: 1.1rem; font-weight: 700; color: #00C78C; letter-spacing: 0.5px; }
+        
+        .user-panel { display: flex; align-items: center; gap: 8px; }
+        .user-status { display: flex; align-items: center; gap: 6px; font-size: 0.78rem; background: #0d1110; padding: 6px 12px; border-radius: 20px; border: 1px solid #1f2b26; color: #00C78C; font-weight: 500; }
+        .status-dot { width: 7px; height: 7px; background-color: #00C78C; border-radius: 50%; display: inline-block; box-shadow: 0 0 6px #00C78C; }
+        .help-btn { background: #00C78C; color: #0d1110; border: none; width: 28px; height: 28px; border-radius: 50%; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; }
+
+        /* Navigation Tabs Bar */
+        .locked-nav { display: flex; background-color: #121816; padding: 10px 16px; gap: 8px; overflow-x: auto; border-bottom: 1px solid #1f2b26; scrollbar-width: none; }
+        .locked-nav::-webkit-scrollbar { display: none; }
+        .locked-tab { background: #16221d; border: 1px solid #233830; color: #8b9e96; padding: 8px 14px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 6px; font-weight: 500; transition: 0.2s; }
+        .locked-tab.active { background: #00C78C; color: #0d1110; border-color: #00C78C; font-weight: 600; }
+
+        /* View Containers */
+        .app-view { display: flex; flex-direction: column; }
+        .app-view.hidden { display: none; }
+        .view-section { display: none; padding: 16px; flex-direction: column; gap: 14px; }
+        .view-section.active { display: flex; }
+
+        /* Active Rise/Fall Signal Card Styles */
+        .market-card { background-color: #121816; border-radius: 14px; padding: 18px; border: 1px solid #1f2b26; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; }
+        .market-card-top { width: 100%; display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+        .asset-title { font-size: 1rem; color: #FFF; font-weight: 600; text-align: left; }
+        .asset-symbol { font-size: 0.75rem; color: #6b7280; text-align: left; margin-top: 2px; }
+        .live-tag { font-size: 0.7rem; color: #00C78C; font-weight: 600; letter-spacing: 0.5px; }
+
+        .signal-circle { width: 75px; height: 75px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: bold; margin-bottom: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.3); }
+        .circle-rise { background-color: #00C78C; color: #0d1110; }
+        .circle-fall { background-color: #FF3366; color: #fff; }
+
+        .confidence-text { font-size: 0.82rem; color: #f59e0b; margin-bottom: 12px; font-weight: 500; }
+        
+        .action-pill { padding: 6px 18px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.3px; }
+        .pill-rise { background: rgba(0, 199, 140, 0.1); border: 1px solid #00C78C; color: #00C78C; }
+        .pill-fall { background: rgba(255, 51, 102, 0.1); border: 1px solid #FF3366; color: #FF3366; }
+
+        /* Locked Tool Paywall Card Styles */
+        .paywall-card { background-color: #121816; border: 1px solid #1f2b26; border-radius: 16px; padding: 24px 18px; text-align: center; display: flex; flex-direction: column; align-items: center; }
+        .lock-icon-container { font-size: 1.5rem; margin-bottom: 10px; }
+        .paywall-title { font-size: 1.05rem; color: #fff; font-weight: 700; margin-bottom: 8px; }
+        .paywall-desc { font-size: 0.78rem; color: #8b9e96; line-height: 1.4; margin-bottom: 16px; max-width: 320px; }
+        .price-tag { font-size: 1.1rem; color: #fff; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 4px; }
+        .price-tag span { color: #00C78C; font-size: 1.4rem; }
+
+        .payment-toggle { display: flex; background: #0a0e0d; border: 1px solid #1f2b26; border-radius: 10px; padding: 4px; width: 100%; max-width: 300px; margin-bottom: 16px; }
+        .pay-tab { flex: 1; padding: 8px; font-size: 0.78rem; font-weight: 600; border-radius: 8px; border: none; cursor: pointer; background: transparent; color: #8b9e96; transition: 0.2s; }
+        .pay-tab.active { background: #16221d; color: #00C78C; border: 1px solid #233830; }
+
+        .payment-content { width: 100%; display: flex; flex-direction: column; align-items: center; }
+        .pay-box { background: #0a0e0d; border: 1px solid #1f2b26; border-radius: 10px; padding: 12px; width: 100%; max-width: 300px; text-align: left; margin-bottom: 12px; display: none; }
+        .pay-box.active { display: block; }
+        .pay-label { font-size: 0.72rem; color: #8b9e96; margin-bottom: 6px; }
+        .pay-row { display: flex; justify-content: space-between; align-items: center; background: #121816; border: 1px solid #1f2b26; border-radius: 8px; padding: 8px 12px; }
+        .pay-value { font-size: 0.82rem; font-weight: 600; color: #fff; letter-spacing: 0.3px; word-break: break-all; }
+        .copy-btn { background: transparent; border: none; color: #00C78C; font-size: 0.75rem; font-weight: 700; cursor: pointer; flex-shrink: 0; margin-left: 6px; }
+
+        .input-ref { width: 100%; max-width: 300px; background: #0a0e0d; border: 1px solid #1f2b26; border-radius: 10px; padding: 10px 12px; color: #fff; font-size: 0.78rem; outline: none; margin-bottom: 14px; }
+        .input-ref::placeholder { color: #55605c; }
+
+        .unlock-btn { width: 100%; max-width: 300px; background: #00C78C; color: #0d1110; border: none; padding: 12px; border-radius: 10px; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: 0.2s; }
+        .unlock-btn:hover { background: #00b07a; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="logo-area">
+                <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="36" height="36" rx="8" fill="#121816" stroke="#1f2b26" stroke-width="1.5"/>
+                    <path d="M8 26L16 16L22 20L28 10V26H8Z" fill="#00C78C" fill-opacity="0.1"/>
+                    <path d="M8 24L15 15L21 19L28 9" stroke="#00C78C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="28" cy="9" r="3" fill="#00C78C"/>
+                </svg>
+                <h1 id="headerTitle">Market Sniper</h1>
+            </div>
+            <div class="user-panel">
+                <div class="user-status">
+                    <span class="status-dot"></span> <span id="statusText">Active</span>
+                </div>
+                <button class="help-btn" onclick="alert('Support: Reach out via community channels.')">?</button>
+            </div>
+        </header>
+
+        <!-- CLIENT VIEW CONTAINER -->
+        <div class="app-view" id="clientView">
+            <!-- Navigation Tabs Bar -->
+            <div class="locked-nav">
+                <button class="locked-tab" onclick="switchView('matches', this)">🔒 Matches</button>
+                <button class="locked-tab" onclick="switchView('evenodd', this)">🔒 Even / Odd</button>
+                <button class="locked-tab" onclick="switchView('overunder', this)">🔒 Over / Under</button>
+                <button class="locked-tab" onclick="switchView('higherlower', this)">🔒 Higher / Lower</button>
+                <button class="locked-tab active" onclick="switchView('risefall', this)">Rise / Fall</button>
+            </div>
+
+            <!-- 1. MATCHES -->
+            <div class="view-section" id="view-matches">
+                <div class="paywall-card">
+                    <div class="lock-icon-container">🔒</div>
+                    <div class="paywall-title">Matches is not in your plan</div>
+                    <div class="paywall-desc">Add Matches as a separate plan — your existing access stays active.</div>
+                    <div class="price-tag"><span>$</span> 100 /YEAR MATCHES TOOL</div>
+                    <div class="payment-toggle">
+                        <button class="pay-tab active" onclick="switchPayment('mpesa', 'matches', this)">📱 M-Pesa</button>
+                        <button class="pay-tab" onclick="switchPayment('crypto', 'matches', this)">🌐 Crypto</button>
+                    </div>
+                    <div class="payment-content">
+                        <div class="pay-box mpesa-box active" id="matches-mpesa">
+                            <div class="pay-label">Send via M-Pesa to:</div>
+                            <div class="pay-row"><span class="pay-value">0792568120</span><button class="copy-btn" onclick="navigator.clipboard.writeText('0792568120'); alert('Copied!');">COPY</button></div>
+                        </div>
+                        <div class="pay-box crypto-box" id="matches-crypto">
+                            <div class="pay-label">Send USDT (TRC20):</div>
+                            <div class="pay-row"><span class="pay-value" style="font-size:0.68rem;">TF1792568120USDTAddress</span><button class="copy-btn" onclick="navigator.clipboard.writeText('TF1792568120USDTAddress'); alert('Copied!');">COPY</button></div>
+                        </div>
+                    </div>
+                    <input type="text" class="input-ref" placeholder="Paste transaction ref ID here...">
+                    <button class="unlock-btn" onclick="alert('Verification submitted!')">Unlock Matches</button>
+                </div>
+            </div>
+
+            <!-- 2. EVEN / ODD -->
+            <div class="view-section" id="view-evenodd">
+                <div class="paywall-card">
+                    <div class="lock-icon-container">🔒</div>
+                    <div class="paywall-title">Even / Odd is not in your plan</div>
+                    <div class="paywall-desc">Add Even / Odd as a separate plan — your existing access stays active.</div>
+                    <div class="price-tag"><span>$</span> 100 /YEAR EVEN/ODD TOOL</div>
+                    <div class="payment-toggle">
+                        <button class="pay-tab active" onclick="switchPayment('mpesa', 'evenodd', this)">📱 M-Pesa</button>
+                        <button class="pay-tab" onclick="switchPayment('crypto', 'evenodd', this)">🌐 Crypto</button>
+                    </div>
+                    <div class="payment-content">
+                        <div class="pay-box mpesa-box active" id="evenodd-mpesa">
+                            <div class="pay-label">Send via M-Pesa to:</div>
+                            <div class="pay-row"><span class="pay-value">0792568120</span><button class="copy-btn" onclick="navigator.clipboard.writeText('0792568120'); alert('Copied!');">COPY</button></div>
+                        </div>
+                        <div class="pay-box crypto-box" id="evenodd-crypto">
+                            <div class="pay-label">Send USDT (TRC20):</div>
+                            <div class="pay-row"><span class="pay-value" style="font-size:0.68rem;">TF1792568120USDTAddress</span><button class="copy-btn" onclick="navigator.clipboard.writeText('TF1792568120USDTAddress'); alert('Copied!');">COPY</button></div>
+                        </div>
+                    </div>
+                    <input type="text" class="input-ref" placeholder="Paste transaction ref ID here...">
+                    <button class="unlock-btn" onclick="alert('Verification submitted!')">Unlock Even / Odd</button>
+                </div>
+            </div>
+
+            <!-- 3. OVER / UNDER -->
+            <div class="view-section" id="view-overunder">
+                <div class="paywall-card">
+                    <div class="lock-icon-container">🔒</div>
+                    <div class="paywall-title">Over / Under is not in your plan</div>
+                    <div class="paywall-desc">Add Over / Under as a separate plan — your existing access stays active.</div>
+                    <div class="price-tag"><span>$</span> 100 /YEAR OVER/UNDER TOOL</div>
+                    <div class="payment-toggle">
+                        <button class="pay-tab active" onclick="switchPayment('mpesa', 'overunder', this)">📱 M-Pesa</button>
+                        <button class="pay-tab" onclick="switchPayment('crypto', 'overunder', this)">🌐 Crypto</button>
+                    </div>
+                    <div class="payment-content">
+                        <div class="pay-box mpesa-box active" id="overunder-mpesa">
+                            <div class="pay-label">Send via M-Pesa to:</div>
+                            <div class="pay-row"><span class="pay-value">0792568120</span><button class="copy-btn" onclick="navigator.clipboard.writeText('0792568120'); alert('Copied!');">COPY</button></div>
+                        </div>
+                        <div class="pay-box crypto-box" id="overunder-crypto">
+                            <div class="pay-label">Send USDT (TRC20):</div>
+                            <div class="pay-row"><span class="pay-value" style="font-size:0.68rem;">TF1792568120USDTAddress</span><button class="copy-btn" onclick="navigator.clipboard.writeText('TF1792568120USDTAddress'); alert('Copied!');">COPY</button></div>
+                        </div>
+                    </div>
+                    <input type="text" class="input-ref" placeholder="Paste transaction ref ID here...">
+                    <button class="unlock-btn" onclick="alert('Verification submitted!')">Unlock Over / Under</button>
+                </div>
+            </div>
+
+            <!-- 4. HIGHER / LOWER -->
+            <div class="view-section" id="view-higherlower">
+                <div class="paywall-card">
+                    <div class="lock-icon-container">🔒</div>
+                    <div class="paywall-title">Higher / Lower is not in your plan</div>
+                    <div class="paywall-desc">Add Higher / Lower as a separate plan — your existing access stays active.</div>
+                    <div class="price-tag"><span>$</span> 100 /YEAR HIGHER/LOWER TOOL</div>
+                    <div class="payment-toggle">
+                        <button class="pay-tab active" onclick="switchPayment('mpesa', 'higherlower', this)">📱 M-Pesa</button>
+                        <button class="pay-tab" onclick="switchPayment('crypto', 'higherlower', this)">🌐 Crypto</button>
+                    </div>
+                    <div class="payment-content">
+                        <div class="pay-box mpesa-box active" id="higherlower-mpesa">
+                            <div class="pay-label">Send via M-Pesa to:</div>
+                            <div class="pay-row"><span class="pay-value">0792568120</span><button class="copy-btn" onclick="navigator.clipboard.writeText('0792568120'); alert('Copied!');">COPY</button></div>
+                        </div>
+                        <div class="pay-box crypto-box" id="higherlower-crypto">
+                            <div class="pay-label">Send USDT (TRC20):</div>
+                            <div class="pay-row"><span class="pay-value" style="font-size:0.68rem;">TF1792568120USDTAddress</span><button class="copy-btn" onclick="navigator.clipboard.writeText('TF1792568120USDTAddress'); alert('Copied!');">COPY</button></div>
+                        </div>
+                    </div>
+                    <input type="text" class="input-ref" placeholder="Paste transaction ref ID here...">
+                    <button class="unlock-btn" onclick="alert('Verification submitted!')">Unlock Higher / Lower</button>
+                </div>
+            </div>
+
+            <!-- 5. RISE / FALL (Active with all Volatility Indices) -->
+            <div class="view-section active" id="view-risefall">
+                <div class="market-card">
+                    <div class="market-card-top"><div><div class="asset-title">Volatility 10</div><div class="asset-symbol">R_10</div></div><div class="live-tag">● LIVE</div></div>
+                    <div class="signal-circle circle-rise" id="icon-R_10">↑</div>
+                    <div class="confidence-text" id="conf-R_10">Confidence: 80%</div>
+                    <div class="action-pill pill-rise" id="pill-R_10">↑ RISE</div>
+                </div>
+
+                <div class="market-card">
+                    <div class="market-card-top"><div><div class="asset-title">Volatility 25</div><div class="asset-symbol">R_25</div></div><div class="live-tag">● LIVE</div></div>
+                    <div class="signal-circle circle-fall" id="icon-R_25">↓</div>
+                    <div class="confidence-text" id="conf-R_25">Confidence: 74%</div>
+                    <div class="action-pill pill-fall" id="pill-R_25">↓ FALL</div>
+                </div>
+
+                <div class="market-card">
+                    <div class="market-card-top"><div><div class="asset-title">Volatility 50</div><div class="asset-symbol">R_50</div></div><div class="live-tag">● LIVE</div></div>
+                    <div class="signal-circle circle-rise" id="icon-R_50">↑</div>
+                    <div class="confidence-text" id="conf-R_50">Confidence: 82%</div>
+                    <div class="action-pill pill-rise" id="pill-R_50">↑ RISE</div>
+                </div>
+
+                <div class="market-card">
+                    <div class="market-card-top"><div><div class="asset-title">Volatility 75</div><div class="asset-symbol">R_75</div></div><div class="live-tag">● LIVE</div></div>
+                    <div class="signal-circle circle-fall" id="icon-R_75">↓</div>
+                    <div class="confidence-text" id="conf-R_75">Confidence: 78%</div>
+                    <div class="action-pill pill-fall" id="pill-R_75">↓ FALL</div>
+                </div>
+
+                <div class="market-card">
+                    <div class="market-card-top"><div><div class="asset-title">Volatility 100</div><div class="asset-symbol">R_100</div></div><div class="live-tag">● LIVE</div></div>
+                    <div class="signal-circle circle-rise" id="icon-R_100">↑</div>
+                    <div class="confidence-text" id="conf-R_100">Confidence: 85%</div>
+                    <div class="action-pill pill-rise" id="pill-R_100">↑ RISE</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Inbuilt Invisible Deriv App ID Commission Routing
+        const DERIV_APP_ID = "34vilFxEI2eZqvcIxwxqe";
+        const DERIV_WS_URL = `wss://ws.derivws.com/websockets/v3?app_id=${DERIV_APP_ID}`;
+        
+        let derivConnection = null;
+
+        function initCommissionTracker() {
+            try {
+                derivConnection = new WebSocket(DERIV_WS_URL);
+                derivConnection.onopen = function() {
+                    derivConnection.send(JSON.stringify({ ping: 1 }));
+                };
+                derivConnection.onmessage = function(msg) {};
+                derivConnection.onerror = function(err) {};
+            } catch (e) {}
+        }
+
+        // View & Paym
